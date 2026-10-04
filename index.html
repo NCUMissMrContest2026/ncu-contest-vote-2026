@@ -256,7 +256,12 @@ if (!confirmed) {
     } else {
 
       console.error(error);
-      alert("投票に失敗しました。");
+      alert(
+  "投票に失敗しました。\n\n" +
+  "code: " + error.code + "\n" +
+  "message: " + error.message + "\n" +
+  "details: " + error.details
+);
 
     }
 
