@@ -7,44 +7,113 @@
   <meta name="viewport"
         content="width=device-width, initial-scale=1.0">
 
-  <title>会場投票 | MISS & MR CONTEST 2026</title>
+  <title>MISS & MR CONTEST 2026 | 会場投票</title>
 
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: sans-serif;
-      background: #fafafa;
-      text-align: center;
       margin: 0;
+      min-height: 100vh;
+      font-family: sans-serif;
+      background: linear-gradient(
+        135deg,
+        #fff8fb,
+        #f8f9ff
+      );
+      color: #333;
+      text-align: center;
+    }
+
+    .container {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       padding: 40px 20px;
     }
 
+    .small-title {
+      font-size: 13px;
+      letter-spacing: 4px;
+      color: #888;
+      margin-bottom: 12px;
+    }
+
     h1 {
-      margin-bottom: 10px;
+      margin: 0;
+      font-size: 30px;
+      letter-spacing: 2px;
     }
 
     .subtitle {
-      color: #666;
-      margin-bottom: 40px;
+      margin-top: 12px;
+      margin-bottom: 45px;
+      font-size: 15px;
+      color: #777;
+      letter-spacing: 2px;
+    }
+
+    .buttons {
+      width: 100%;
+      max-width: 420px;
     }
 
     .vote-link {
       display: block;
-      max-width: 400px;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 15px;
+      width: 100%;
+      padding: 22px 20px;
+      margin-bottom: 20px;
+      border-radius: 18px;
       color: white;
       text-decoration: none;
-      font-size: 22px;
+      font-size: 21px;
       font-weight: bold;
+      letter-spacing: 1px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      transition: 0.2s;
+    }
+
+    .vote-link:active {
+      transform: scale(0.97);
     }
 
     .miss {
-      background: #e8a6bd;
+      background: linear-gradient(
+        135deg,
+        #e8a6bd,
+        #d98eab
+      );
     }
 
     .mr {
-      background: #8fa8d8;
+      background: linear-gradient(
+        135deg,
+        #8fa8d8,
+        #718fc5
+      );
+    }
+
+    .arrow {
+      font-size: 14px;
+      margin-left: 8px;
+    }
+
+    .notice {
+      margin-top: 25px;
+      font-size: 12px;
+      color: #999;
+      line-height: 1.7;
+    }
+
+    .footer {
+      margin-top: 45px;
+      font-size: 11px;
+      color: #aaa;
+      letter-spacing: 1px;
     }
   </style>
 
@@ -52,23 +121,43 @@
 
 <body>
 
-  <h1>CONTEST 2026</h1>
+  <div class="container">
 
-  <div class="subtitle">
-    会場投票
+    <div class="small-title">
+      NCU CONTEST 2026
+    </div>
+
+    <h1>
+      MISS & MR CONTEST
+    </h1>
+
+    <div class="subtitle">
+      会場投票
+    </div>
+
+    <div class="buttons">
+
+      <a href="index.html" class="vote-link miss">
+        MISSに投票する
+        <span class="arrow">›</span>
+      </a>
+
+      <a href="mr.html" class="vote-link mr">
+        MRに投票する
+        <span class="arrow">›</span>
+      </a>
+
+    </div>
+
+    <div class="notice">
+      投票したいコンテストを選択してください。
+    </div>
+
+    <div class="footer">
+      MISS CONTEST 2026 × MR CONTEST 2026
+    </div>
+
   </div>
-
-  <p>
-    投票したいコンテストを選んでください。
-  </p>
-
-  <a href="index.html" class="vote-link miss">
-    MISSに投票する
-  </a>
-
-  <a href="mr.html" class="vote-link mr">
-    MRに投票する
-  </a>
 
 </body>
 </html>
