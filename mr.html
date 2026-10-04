@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>MR CONTEST 2026 会場投票</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f8f8ff;
+      text-align: center;
+      margin: 0;
+      padding: 30px 15px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      margin-bottom: 30px;
+      color: #666;
+    }
+
+    #candidates {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .candidate {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .candidate img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 12px;
+    }
+
+    .candidate-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .vote-button {
+      width: 100%;
+      max-width: 300px;
+      padding: 15px;
+      border: none;
+      border-radius: 30px;
+      background: #8fa8d8;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .vote-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    #voteComplete {
+      display: none;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      max-width: 500px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>MR CONTEST 2026</h1>
+
+  <div class="subtitle">会場投票</div>
+
+  <p>応援したい候補者を1名選んでください。</p>
+
+  <div id="candidates"></div>
+
+  <div id="voteComplete">
+    <h2>投票ありがとうございました！</h2>
+    <p>あなたの投票を受け付けました。</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
+  <script>
+
+  const SUPABASE_URL =
+    "https://kyatjomzupddnmbmyjvu.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_J7t9c_3CtqXmpGv3nmJKfQ_g8MocwYp";
+
+  const supabaseClient = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+  // 候補者を読み込む
+  async function loadCandidates() {
+
+    const { data, error } = await supabaseClient
+      .from("mr_candidates")
+      .select("*")
+      .order("id");
+
+    if (error) {
+
+      console.error(error);
+
+      alert("候補者を読み込めませんでした");
+
+      return;
+    }
+
+    const container =
+      document.getElementById("candidates");
+
+    container.innerHTML = "";
+
+    data.forEach(candidate => {
+
+      const div =
+        document.createElement("div");
+
+      div.className = "candidate";
+
+      div.innerHTML = `
+        <img src="${candidate.image_url}">
+
+        <div class="candidate-name">
+          ${candidate.name}
+        </div>
+
+        <button
+          class="vote-button"
+          onclick="vote(${candidate.id})">
+          この候補者に投票する
+        </button>
+      `;
+
+      container.appendChild(div);
+
+    });
+  }
+
+
+  // 投票
+  async function vote(candidateId) {
+
+    const confirmed =
+      confirm("この候補者に投票しますか？");
+
+    if (!confirmed) {
+      return;
+    }
+
+    const voterId =
+      localStorage.getItem("event_mr_voter_id") ||
+      crypto.randomUUID();
+
+    localStorage.setItem(
+      "event_mr_voter_id",
+      voterId
+    );
+
+    const now = new Date();
+
+    const today =
+      now.getFullYear() + "-" +
+      String(now.getMonth() + 1).padStart(2, "0") + "-" +
+      String(now.getDate()).padStart(2, "0");
+
+
+    const { error } = await supabaseClient
+      .from("event_mr_votes")
+      .insert({
+        candidate_id: candidateId,
+        voter_id: voterId,
+        vote_date: today
+      });
+
+
+    if (error) {
+
+      if (error.code === "23505") {
+
+        alert(
+          "この端末ではすでに投票しています。"
+        );
+
+      } else {
+
+        console.error(error);
+
+        alert("投票に失敗しました。");
+      }
+
+      return;
+    }
+
+
+    document.getElementById(
+      "candidates"
+    ).style.display = "none";
+
+    document.getElementById(
+      "voteComplete"
+    ).style.display = "block";
+  }
+
+
+  // ページを開いたら候補者を読み込む
+  loadCandidates();
+
+  </script>
+
+</body>
+</html>
