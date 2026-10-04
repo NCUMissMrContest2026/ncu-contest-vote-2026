@@ -118,7 +118,7 @@ const SUPABASE_URL = "https://kyatjomzupddnmbmyjvu.supabase.co";
 const SUPABASE_KEY =
 "sb_publishable_J7t9c_3CtqXmpGv3nmJKfQ_g8MocwYp";
 
-const supabase = window.supabase.createClient(
+const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
   SUPABASE_KEY
 );
@@ -127,7 +127,7 @@ const supabase = window.supabase.createClient(
 // 候補者を読み込む
 async function loadCandidates() {
 
-  const { data, error } = await supabase
+  const { data, error } = await supabaseClient
     .from("candidates")
     .select("*")
     .order("id");
@@ -188,7 +188,7 @@ async function vote(candidateId) {
     String(now.getDate()).padStart(2, "0");
 
 
-  const { error } = await supabase
+  const { error } = await supabaseClient
     .from("event_votes")
     .insert({
       candidate_id: candidateId,
