@@ -96,6 +96,26 @@
       border-radius: 15px;
       max-width: 500px;
     }
+    .entry-number {
+  margin-top: 18px;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #000;
+}
+
+.candidate-name {
+  font-size: 24px;
+  font-weight: 600;
+  margin: 8px 0 3px;
+  font-family: "Noto Serif JP", serif;
+}
+
+.candidate-reading {
+  font-size: 13px;
+  color: #000;
+  letter-spacing: 1px;
+  margin-bottom: 25px;
+}
   </style>
 </head>
 
@@ -162,10 +182,17 @@
       div.innerHTML = `
         <img src="${candidate.image_url}">
 
-        <div class="candidate-name">
-          ${candidate.name}
-        </div>
+        <div class="entry-number">
+  ENTRY No.${String(candidate.id).padStart(2, "0")}
+</div>
 
+<div class="candidate-name">
+  ${candidate.name}
+</div>
+
+<div class="candidate-reading">
+  ${candidate.reading}
+</div>
         <button
           class="vote-button"
           onclick="vote(${candidate.id})">
