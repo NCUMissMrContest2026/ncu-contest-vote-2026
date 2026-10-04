@@ -109,7 +109,122 @@
     </p>
 
   </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
+<script>
+
+const SUPABASE_URL = "https://kyatjomzupddnmbmyjvu.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_J7t9c_3CtqXmpGv3nmJKfQ_g8MocwYp";
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+
+// 候補者を読み込む
+async function loadCandidates() {
+
+  const { data, error } = await supabase
+    .from("candidates")
+    .select("*")
+    .order("id");
+
+  if (error) {
+    console.error(error);
+    alert("候補者を読み込めませんでした");
+    return;
+  }
+
+  const container = document.getElementById("candidates");
+
+  container.innerHTML = "";
+
+  data.forEach(candidate => {
+
+    const div = document.createElement("div");
+
+    div.className = "candidate";
+
+    div.innerHTML = `
+      <img src="${candidate.image_url}">
+      <div class="candidate-name">
+        ${candidate.name}
+      </div>
+
+      <button
+        class="vote-button"
+        onclick="vote(${candidate.id})">
+        この候補者に投票する
+      </button>
+    `;
+
+    container.appendChild(div);
+
+  });
+
+}
+
+
+// 投票
+async function vote(candidateId) {
+
+  const voterId =
+    localStorage.getItem("event_voter_id") ||
+    crypto.randomUUID();
+
+  localStorage.setItem(
+    "event_voter_id",
+    voterId
+  );
+
+  const now = new Date();
+
+  const today =
+    now.getFullYear() + "-" +
+    String(now.getMonth() + 1).padStart(2, "0") + "-" +
+    String(now.getDate()).padStart(2, "0");
+
+
+  const { error } = await supabase
+    .from("event_votes")
+    .insert({
+      candidate_id: candidateId,
+      voter_id: voterId,
+      vote_date: today
+    });
+
+
+  if (error) {
+
+    if (error.code === "23505") {
+
+      alert("この端末ではすでに投票しています。");
+
+    } else {
+
+      console.error(error);
+      alert("投票に失敗しました。");
+
+    }
+
+    return;
+  }
+
+
+  document.getElementById("candidates").style.display = "none";
+
+  document.getElementById("voteComplete").style.display = "block";
+
+}
+
+
+// ページを開いたら候補者を読み込む
+loadCandidates();
+
+</script>
 </body>
 
 </html>
