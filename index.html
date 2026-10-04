@@ -171,6 +171,12 @@ async function loadCandidates() {
 // 投票
 async function vote(candidateId) {
 
+const confirmed = confirm("この候補者に投票しますか？");
+
+if (!confirmed) {
+  return;
+}
+  
   const voterId =
     localStorage.getItem("event_voter_id") ||
     crypto.randomUUID();
