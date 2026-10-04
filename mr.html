@@ -9,9 +9,13 @@
 
   <title>NCU Mr.Contest 2026 会場投票</title>
 
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     body {
-      font-family: sans-serif;
+      font-family: "Noto Serif JP", serif;
       background: #f8f8ff;
       text-align: center;
       margin: 0;
@@ -55,23 +59,35 @@
     }
 
     .vote-button {
-      width: 100%;
-      max-width: 300px;
-      padding: 15px;
-      border: none;
-      border-radius: 30px;
-      background: #8fa8d8;
-      color: white;
-      font-size: 18px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+  width: 100%;
+  max-width: 300px;
+  padding: 14px 20px;
+  border: 1px solid #829bc9;
+  border-radius: 4px;
+  background: white;
+  color: #607eaf;
+  font-family: "Noto Serif JP", serif;
+  font-size: 16px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
 
-    .vote-button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
-    }
+.vote-button:hover {
+  background: #829bc9;
+  color: white;
+}
 
+.vote-button:active {
+  transform: scale(0.97);
+}
+
+.vote-button:disabled {
+  background: #eee;
+  border-color: #ccc;
+  color: #999;
+  cursor: not-allowed;
+}
     #voteComplete {
       display: none;
       margin: 30px auto;
