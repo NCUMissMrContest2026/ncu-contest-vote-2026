@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <title>MISS CONTEST 2026 会場投票</title>
+
+  <style>
+
+    body {
+      font-family: sans-serif;
+      background: #fff8fb;
+      text-align: center;
+      margin: 0;
+      padding: 30px 15px;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      margin-bottom: 30px;
+      color: #666;
+    }
+
+    #candidates {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .candidate {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .candidate img {
+      width: 100%;
+      max-width: 300px;
+      border-radius: 12px;
+    }
+
+    .candidate-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin: 15px 0;
+    }
+
+    .vote-button {
+      width: 100%;
+      max-width: 300px;
+      padding: 15px;
+      border: none;
+      border-radius: 30px;
+      background: #e8a6bd;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .vote-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    #voteComplete {
+      display: none;
+      margin: 30px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 15px;
+      max-width: 500px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <h1>MISS CONTEST 2026</h1>
+
+  <div class="subtitle">
+    会場投票
+  </div>
+
+  <p>
+    応援したい候補者を1名選んでください。
+  </p>
+
+  <div id="candidates">
+  </div>
+
+  <div id="voteComplete">
+
+    <h2>投票ありがとうございました！</h2>
+
+    <p>
+      あなたの投票を受け付けました。
+    </p>
+
+  </div>
+
+</body>
+
+</html>
