@@ -9,7 +9,7 @@
 
   <title>NCU Miss.Contest 2026 会場投票</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.googleapis.com">F
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;500;600;700&display=swap" rel="stylesheet">
 
@@ -221,14 +221,21 @@ if (!confirmed) {
   return;
 }
   
-  const voterId =
-    localStorage.getItem("event_voter_id") ||
-    crypto.randomUUID();
+ let voterId =
+  localStorage.getItem("event_voter_id");
+
+if (!voterId) {
+  voterId =
+    "voter_" +
+    Date.now() +
+    "_" +
+    Math.random().toString(36).substring(2, 10);
 
   localStorage.setItem(
     "event_voter_id",
     voterId
   );
+}
 
   const now = new Date();
 
