@@ -149,6 +149,13 @@
     SUPABASE_KEY
   );
 
+    // 投票締切（日本時間）
+const VOTING_DEADLINE = new Date("2026-11-08T15:30:00+09:00");
+
+// 締切を過ぎているか確認
+function isVotingClosed() {
+  return new Date() >= VOTING_DEADLINE;
+}
 
   // 候補者を読み込む
   async function loadCandidates() {
@@ -172,7 +179,12 @@
 
     container.innerHTML = "";
 
-    data.forEach(candidate => {
+if (isVotingClosed()) {
+  container.innerHTML = "<h2>投票は終了しました。</h2>";
+  return;
+}
+
+data.forEach(candidate => {
 
       const div =
         document.createElement("div");
@@ -209,6 +221,12 @@
   // 投票
   async function vote(candidateId) {
 
+if (isVotingClosed()) {
+  alert("投票受付は終了しました。");
+  location.reload();
+  return;
+}
+    
     const confirmed =
       confirm("この候補者に投票しますか？");
 
