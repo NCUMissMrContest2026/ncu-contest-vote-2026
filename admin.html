@@ -1,1 +1,523 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>管理者ページ | NCU Miss.Mr.Contest 2026</title>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 25px 15px;
+  background: #f7f5f6;
+  color: #555;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 750px;
+  margin: auto;
+}
+
+h1 {
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: 25px;
+  color: #947783;
+  margin-bottom: 5px;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 12px;
+  letter-spacing: 2px;
+  margin-bottom: 30px;
+}
+
+.box {
+  background: white;
+  padding: 22px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  box-shadow: 0 2px 10px #00000008;
+}
+
+input {
+  width: 100%;
+  padding: 13px;
+  margin: 8px 0;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 25px;
+  background: #c9aeb8;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+button:disabled {
+  opacity: .5;
+}
+
+.tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 18px;
+}
+
+.tabs button {
+  flex: 1;
+}
+
+.tabs button.active {
+  background: #8c6875;
+}
+
+.total {
+  text-align: center;
+  color: #947783;
+}
+
+.total strong {
+  display: block;
+  font-size: 42px;
+  margin-top: 8px;
+}
+
+.candidate {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 13px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.candidate img {
+  width: 55px;
+  height: 65px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.candidate-info {
+  flex: 1;
+}
+
+.candidate-name {
+  font-weight: bold;
+}
+
+.candidate-reading {
+  font-size: 12px;
+  color: #999;
+  margin-top: 4px;
+}
+
+.vote-count {
+  font-size: 22px;
+  color: #947783;
+  font-weight: bold;
+}
+
+.day-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.small {
+  font-size: 12px;
+  color: #999;
+}
+
+.hidden {
+  display: none;
+}
+
+.message {
+  text-align: center;
+  color: #a45c69;
+  font-size: 13px;
+  margin-top: 12px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.logout {
+  background: #999;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>NCU Miss.Mr.Contest 2026</h1>
+<div class="subtitle">ADMINISTRATOR PAGE</div>
+
+<!-- ログイン画面 -->
+<div id="loginArea" class="box">
+
+<h3>管理者ログイン</h3>
+
+<input
+  type="email"
+  id="email"
+  placeholder="メールアドレス"
+>
+
+<input
+  type="password"
+  id="password"
+  placeholder="パスワード"
+>
+
+<button onclick="login()" style="width:100%;">
+ログイン
+</button>
+
+<div id="loginMessage" class="message"></div>
+
+</div>
+
+<!-- 管理画面 -->
+<div id="adminArea" class="hidden">
+
+<div class="box">
+  <div class="tabs">
+    <button id="missTab" class="active" onclick="changeCategory('miss')">
+      Miss
+    </button>
+
+    <button id="mrTab" onclick="changeCategory('mr')">
+      Mr
+    </button>
+  </div>
+
+  <div class="total">
+    総投票数
+    <strong id="totalVotes">0</strong>
+    <span class="small">VOTES</span>
+  </div>
+</div>
+
+<div class="box">
+  <h3>候補者別投票数</h3>
+  <div id="candidateList"></div>
+</div>
+
+<div class="box">
+  <h3>日別投票数</h3>
+  <div id="dailyList"></div>
+</div>
+
+<div class="box">
+  <div class="actions">
+    <button onclick="loadData()">更新する</button>
+    <button class="logout" onclick="logout()">ログアウト</button>
+  </div>
+
+  <p class="small" style="text-align:center;margin-top:15px;">
+    ※投票数は手動更新で最新の状態になります。
+  </p>
+
+  <div id="updateMessage" class="message"></div>
+</div>
+
+</div>
+</div>
+
+<script>
+
+// Supabase接続
+const SUPABASE_URL =
+"https://kyatjomzupddnmbmyjvu.supabase.co";
+
+const SUPABASE_KEY =
+"sb_publishable_J7t9c_3CtqXmpGv3nmJKfQ_g8MocwYp";
+
+const supabaseClient =
+supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// 管理者UID
+const ADMIN_UID =
+"1487d269-bb9f-4833-9b78-adf7441d30ff";
+
+let currentCategory = "miss";
+
+// テーブル情報
+const tables = {
+  miss: {
+    candidates: "candidates",
+    votes: "event_votes"
+  },
+  mr: {
+    candidates: "mr_candidates",
+    votes: "event_mr_votes"
+  }
+};
+
+// ログイン
+async function login() {
+
+  const email =
+    document.getElementById("email").value;
+
+  const password =
+    document.getElementById("password").value;
+
+  const message =
+    document.getElementById("loginMessage");
+
+  message.textContent = "ログイン中...";
+
+  const { data, error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+    message.textContent =
+      "ログインできませんでした。入力内容を確認してください。";
+    return;
+  }
+
+  if (data.user.id !== ADMIN_UID) {
+    await supabaseClient.auth.signOut();
+
+    message.textContent =
+      "管理者権限がありません。";
+
+    return;
+  }
+
+  document.getElementById("loginArea").classList.add("hidden");
+  document.getElementById("adminArea").classList.remove("hidden");
+
+  await loadData();
+}
+
+// ログアウト
+async function logout() {
+
+  await supabaseClient.auth.signOut();
+
+  document.getElementById("adminArea").classList.add("hidden");
+  document.getElementById("loginArea").classList.remove("hidden");
+
+  document.getElementById("password").value = "";
+}
+
+// Miss・Mr切り替え
+async function changeCategory(category) {
+
+  currentCategory = category;
+
+  document.getElementById("missTab")
+    .classList.toggle("active", category === "miss");
+
+  document.getElementById("mrTab")
+    .classList.toggle("active", category === "mr");
+
+  await loadData();
+}
+
+// 投票データ読み込み
+async function loadData() {
+
+  const message =
+    document.getElementById("updateMessage");
+
+  message.textContent = "読み込み中...";
+
+  const { data: userData } =
+    await supabaseClient.auth.getUser();
+
+  if (!userData.user ||
+      userData.user.id !== ADMIN_UID) {
+
+    message.textContent =
+      "管理者としてログインしてください。";
+
+    return;
+  }
+
+  const table = tables[currentCategory];
+
+  const { data: candidates, error: candidateError } =
+    await supabaseClient
+      .from(table.candidates)
+      .select("id,name,reading,image_url")
+      .order("id");
+
+  if (candidateError) {
+    message.textContent =
+      "候補者データを取得できませんでした。";
+    return;
+  }
+
+  const { data: votes, error: voteError } =
+    await supabaseClient
+      .from(table.votes)
+      .select("candidate_id,vote_date");
+
+  if (voteError) {
+    message.textContent =
+      "投票データを取得できませんでした：" +
+      voteError.message;
+    return;
+  }
+
+  // 合計投票数
+  document.getElementById("totalVotes").textContent =
+    votes.length;
+
+  // 候補者別集計
+  const counts = {};
+
+  candidates.forEach(candidate => {
+    counts[candidate.id] = 0;
+  });
+
+  votes.forEach(vote => {
+    if (counts[vote.candidate_id] !== undefined) {
+      counts[vote.candidate_id]++;
+    }
+  });
+
+  const candidateList =
+    document.getElementById("candidateList");
+
+  candidateList.innerHTML = "";
+
+  candidates.forEach(candidate => {
+
+    const div = document.createElement("div");
+    div.className = "candidate";
+
+    if (candidate.image_url) {
+      const img = document.createElement("img");
+      img.src = candidate.image_url;
+      img.alt = candidate.name;
+      div.appendChild(img);
+    }
+
+    const info = document.createElement("div");
+    info.className = "candidate-info";
+
+    const name = document.createElement("div");
+    name.className = "candidate-name";
+    name.textContent = candidate.name;
+
+    const reading = document.createElement("div");
+    reading.className = "candidate-reading";
+    reading.textContent = candidate.reading || "";
+
+    info.appendChild(name);
+    info.appendChild(reading);
+
+    const count = document.createElement("div");
+    count.className = "vote-count";
+    count.textContent = counts[candidate.id] + "票";
+
+    div.appendChild(info);
+    div.appendChild(count);
+
+    candidateList.appendChild(div);
+  });
+
+  // 日別集計
+  const dailyCounts = {};
+
+  votes.forEach(vote => {
+
+    const date = vote.vote_date;
+
+    if (!date) return;
+
+    dailyCounts[date] =
+      (dailyCounts[date] || 0) + 1;
+  });
+
+  const dailyList =
+    document.getElementById("dailyList");
+
+  dailyList.innerHTML = "";
+
+  const dates = Object.keys(dailyCounts).sort().reverse();
+
+  if (dates.length === 0) {
+
+    dailyList.textContent =
+      "まだ投票データがありません。";
+
+  } else {
+
+    dates.forEach(date => {
+
+      const div = document.createElement("div");
+      div.className = "day-row";
+
+      const dateText = document.createElement("span");
+      dateText.textContent = date;
+
+      const countText = document.createElement("strong");
+      countText.textContent =
+        dailyCounts[date] + "票";
+
+      div.appendChild(dateText);
+      div.appendChild(countText);
+
+      dailyList.appendChild(div);
+    });
+  }
+
+  message.textContent = "最新の投票数を取得しました。";
+}
+
+// ページ読み込み時のログイン状態確認
+async function checkLogin() {
+
+  const { data } =
+    await supabaseClient.auth.getSession();
+
+  const user = data.session?.user;
+
+  if (user && user.id === ADMIN_UID) {
+
+    document.getElementById("loginArea")
+      .classList.add("hidden");
+
+    document.getElementById("adminArea")
+      .classList.remove("hidden");
+
+    await loadData();
+  }
+}
+
+checkLogin();
+
+</script>
+
+</body>
+</html>
